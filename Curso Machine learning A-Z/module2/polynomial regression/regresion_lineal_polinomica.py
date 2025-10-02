@@ -7,7 +7,7 @@ import pandas as pd                                                             
 
 # %%
 # ---------- Importación del Dataset Data.csv ubicado en la misma carpeta ----------
-dataset = pd.read_csv('Position_Salaries.csv')                                                               # Guardamos el dataset en una carpeta
+dataset = pd.read_csv('Position_Salaries.csv')                                                  # Guardamos el dataset en una carpeta
 ##print(dataset)                                                                                # --> Podemos descomentar para hacer traza   
 
 
@@ -18,16 +18,64 @@ X = dataset.iloc[:, 1:2].values                                                 
 y = dataset.iloc[:, 2].values                                                                  # Indicamos que solo queremos la última columna <-- VARIABLE A PREDECIR
 ##print(y)                                                                                      # --> Podemos descomentar para hacer traza
 
+
+# %%
+"""
+# ---------- Dividir dataset en cjto de entrenamiento y test ----------
+from sklearn.model_selection import train_test_split                                            # Librería para dividir dataset en conjuntos
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)    # Creación de variables
+##print(X_train)                                                                                # --> Descomentar para hacer la traza
+##print(y_train)                                                                                # --> Descomentar para hacer la traza
+##print(X_test)                                                                                 # --> Descomentar para hacer la traza
+##print(y_test)                                                                                 # --> Descomentar para hacer la traza
+"""
+
 # %%
 # ---------- Ajustar la regresión lineal con el dataset ----------
 from sklearn.linear_model import LinearRegression
 linear_regression = LinearRegression()
 linear_regression.fit(X,y)
 
+
 # %%
 # ---------- Ajustar la regresión polinómica con el dataset ----------
 from sklearn.preprocessing import PolynomialFeatures                                            # Librería para establecer la regresión polinómica
-polynomial_regression = PolynomialFeatures(degree=2)                                            # Genera características de X y sus cuadrados (o su cubo... epende del grado)
+polynomial_regression = PolynomialFeatures(degree=6)                                            # Genera características de X y sus cuadrados (o su cubo... epende del grado), más grado es más preciso
 X_poly = polynomial_regression.fit_transform(X)                                                 # Confirmamos y aplicamos los cambios en X
-X_poly = X[:, 1:]
+linear_regression_2 = LinearRegression()                                                        # Generamos otra instancia diferente de LinearRegression para nuestro nuevo modelo
+linear_regression_2.fit(X_poly, y)                                                              # Adaptamos el modelo lineal a las nuevas variables
+
+
+# %%
+# ---------- Visualización de los resultados del modelo lineal ----------
+# Lo que hacemos aquí es usar pyplot para pintar las gráficas y la nube de puntos
+plt.scatter(X, y, color = "red")
+plt.plot(X, linear_regression.predict(X), color = "blue")
+plt.title("Modelo de regresión lineal")
+plt.xlabel("Nivel del empleado")
+plt.ylabel("Sueldo del empleado en $")
+plt.ticklabel_format(style='plain', axis='y')                                                       # Para poder mostrar los valores reales que hay en el eje de las y
+plt.show()
+
+# %%
+# ---------- Visualización de los resultados del modelo Polinomico ----------
+# Lo que hacemos aquí es usar pyplot para pintar las gráficas y la nube de puntos
+X_grid = np.arange(min(X), max(X), 0.1)                                                             # Creamos un nuevo vector con más datos entre el mínimo y el máximo de X
+X_grid = X_grid.reshape((len(X_grid), 1))                                                           # Convertimos X_grid de vector fila a vector columna
+plt.scatter(X, y, color = 'red')
+plt.plot(X_grid, linear_regression_2.predict(polynomial_regression.fit_transform(X_grid)), color = 'blue')
+plt.title('Truth or Bluff (Polynomial Regression)')
+plt.xlabel('Position level')
+plt.ylabel('Salary')
+plt.ticklabel_format(style='plain', axis='y')                                                       # Para poder mostrar los valores reales que hay en el eje de las y
+plt.show()
+
+
+# %%
+# ---------- Predicción de nuestros modelo de regresión lineal ----------
+linear_regression.predict([[6.5]])                                                                  # Predicción con modelo de regresión lineal
+
+# %%
+# ---------- Predicción de nuestro modelo de regresión polinómicas ----------
+linear_regression_2.predict(polynomial_regression.fit_transform([[6.5]]))                           # Predicción con modelo de regresión polinómica 
 # %%
